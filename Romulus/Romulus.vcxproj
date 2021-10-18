@@ -145,7 +145,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine\Core\Core.h" />
+    <ClInclude Include="src\Engine\Core\Window.h" />
+    <ClInclude Include="src\Engine\Util\Utils.h" />
     <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_features.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_fixes.hpp" />
@@ -564,9 +567,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\EntryPoint.cpp" />
+    <ClCompile Include="src\Engine\Core\Window.cpp" />
+    <ClCompile Include="src\Engine\Util\Utils.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\imgui\ImGui.vcxproj">

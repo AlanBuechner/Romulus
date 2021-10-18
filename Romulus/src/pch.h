@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Engine\Util\Utils.h"
+
 // include when logging is implemented
 //#include "Engine/Core/Log.h" 
 

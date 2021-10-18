@@ -1284,6 +1284,9 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Core\Window.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="src\Engine\Util\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\EntryPoint.cpp">
@@ -1292,5 +1295,8 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Core\Window.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="src\Engine\Util\Utils.cpp" />
   </ItemGroup>
 </Project>
