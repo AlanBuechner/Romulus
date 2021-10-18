@@ -1,0 +1,15 @@
+[submodule "Romulus/vendor/spdlog"]
+	path = Romulus/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "Romulus/vendor/imgui"]
+	path = Romulus/vendor/imgui
+	url = https://github.com/AlanBuechner/imgui
+[submodule "Romulus/vendor/glm"]
+	path = Romulus/vendor/glm
+	url = https://github.com/g-truc/glm
+[submodule "Romulus/vendor/entt"]
+	path = Romulus/vendor/entt
+	url = https://github.com/skypjack/entt
+[submodule "Romulus/vendor/yaml-cpp"]
+	path = Romulus/vendor/yaml-cpp
+	url = https://github.com/AlanBuechner/yaml-cpp
