@@ -27,6 +27,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 group "Dependencies"
 	include "Romulus/vendor/imgui"
 	include "Romulus/vendor/yaml-cpp"
+	include "Romulus/vendor/stb_image"
 group ""
 
 
