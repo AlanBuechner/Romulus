@@ -42,6 +42,11 @@ namespace Engine
 		ShowWindow(hWnd, SW_SHOW);
 	}
 
+	WindowsWindow::~WindowsWindow()
+	{
+		Close();
+	}
+
 	void WindowsWindow::OnUpdate()
 	{
 		// pull events

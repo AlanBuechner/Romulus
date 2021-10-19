@@ -10,6 +10,7 @@ namespace Engine
 	{
 	public:
 		WindowsWindow(uint32 width, uint32 height, const std::string& title);
+		~WindowsWindow();
 
 		virtual void OnUpdate() override; // updates the window
 

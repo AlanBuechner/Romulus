@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Core.h"
 #include "Window.h"
+#include "Engine\Math\Math.h"
 
 #ifdef PLATFORM_WINDOWS
 

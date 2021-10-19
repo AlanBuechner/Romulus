@@ -13,6 +13,7 @@
 #include <unordered_set>
 
 #include "Engine\Util\Utils.h"
+#include "Engine\Math\Math.h"
 
 // include when logging is implemented
 //#include "Engine/Core/Log.h" 
