@@ -6,6 +6,11 @@
 
 namespace Engine
 {
+	class Cursor;
+}
+
+namespace Engine
+{
 	class WindowsWindow : public Window
 	{
 	public:
@@ -52,5 +57,7 @@ namespace Engine
 			HINSTANCE hInst;
 		};
 
+
+		friend Cursor;
 	};
 }
