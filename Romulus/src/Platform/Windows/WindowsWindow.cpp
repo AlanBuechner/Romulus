@@ -70,16 +70,19 @@ namespace Engine
 
 	void WindowsWindow::SetWidth(uint32 width)
 	{
+		if (m_FullScreen) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, width, m_Height, 0);
 	}
 
 	void WindowsWindow::SetHeight(uint32 height)
 	{
+		if (m_FullScreen) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, m_Width, height, 0);
 	}
 
 	void WindowsWindow::Resize(uint32 width, uint32 height)
 	{
+		if (m_FullScreen) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, width, height, 0);
 	}
 
@@ -91,35 +94,40 @@ namespace Engine
 	void WindowsWindow::ToggleMinimize()
 	{
 		ShowWindow(hWnd, m_Minimized ? (m_Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL) : SW_SHOWMINIMIZED);
-		m_Minimized = !m_Minimized;
 	}
 
 	void WindowsWindow::ToggleMaximize()
 	{
 		ShowWindow(hWnd, m_Maximized ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
-		m_Maximized = !m_Maximized;
-		m_Minimized = false;
 	}
 
+	WINDOWPLACEMENT g_wpPrev = { sizeof(g_wpPrev) };
 	void WindowsWindow::ToggleFullScreen()
 	{
 		DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
-		if (m_FullScreen) 
+		if (!m_FullScreen) 
 		{
 			MONITORINFO mi = { sizeof(mi) };
-			if (GetMonitorInfo(MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
+			if (GetWindowPlacement(hWnd, &g_wpPrev) && GetMonitorInfo(MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
 			{
 				SetWindowLong(hWnd, GWL_STYLE,dwStyle & ~WS_OVERLAPPEDWINDOW);
+				SetWindowPos(hWnd, HWND_TOP,
+					mi.rcMonitor.left, mi.rcMonitor.top,
+					mi.rcMonitor.right - mi.rcMonitor.left,
+					mi.rcMonitor.bottom - mi.rcMonitor.top,
+					SWP_NOOWNERZORDER | SWP_FRAMECHANGED
+				);
 
 				m_FullScreen = true;
+				m_Minimized = false;
 			}
 		}
 		else 
 		{
 			SetWindowLong(hWnd, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
+			SetWindowPlacement(hWnd, &g_wpPrev);
 
 			ShowWindow(hWnd, m_Minimized ? SW_SHOWMINIMIZED : (m_Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL));
-
 			m_FullScreen = false;
 		}
 	}
@@ -184,10 +192,32 @@ namespace Engine
 
 			// window events
 		case WM_SIZE: // windows resize event
+		{
+			switch (wParam)
+			{
+			case SIZE_MAXIMIZED:
+				m_Maximized = true;
+				m_Minimized = false;
+				break;
+			case SIZE_MINIMIZED:
+				m_Minimized = true;
+				break;
+			case SIZE_RESTORED:
+				m_Minimized = false;
+				m_Maximized = false;
+				break;
+			
+			default:
+				break;
+			
+			}
+
+			// set the width and hight
 			m_Width = LOWORD(lParam);
 			m_Height = HIWORD(lParam);
 			// resize swap chain
 			break;
+		}
 		case WM_KILLFOCUS: // window remove focuse event
 			break;
 		case WM_CLOSE: // window close event

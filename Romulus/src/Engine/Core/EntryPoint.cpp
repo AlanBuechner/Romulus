@@ -11,14 +11,11 @@ int main(int argc, char** argv)
 
 	std::cout << "hello world" << std::endl;
 
-	//window->ToggleMaximize();
-	//window->ToggleFullScreen();
-	//window->ToggleFullScreen();
-
 
 	while (!window->IsWindowClosed())
 	{
 		window->OnUpdate();
+		std::cout << window->IsFullScreen() << window->IsMaximized() << window->IsMinimized() << std::endl;
 	}
 
 	return EXIT_SUCCESS;
