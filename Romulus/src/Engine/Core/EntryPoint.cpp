@@ -11,6 +11,8 @@ int main(int argc, char** argv)
 
 	std::cout << "hello world" << std::endl;
 
+	window->ToggleMinimize();
+	window->Resize(100,100);
 
 	while (!window->IsWindowClosed())
 	{

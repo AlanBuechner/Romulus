@@ -70,19 +70,19 @@ namespace Engine
 
 	void WindowsWindow::SetWidth(uint32 width)
 	{
-		if (m_FullScreen) return;
+		if (m_FullScreen || m_Maximized || m_Minimized) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, width, m_Height, 0);
 	}
 
 	void WindowsWindow::SetHeight(uint32 height)
 	{
-		if (m_FullScreen) return;
+		if (m_FullScreen || m_Maximized || m_Minimized) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, m_Width, height, 0);
 	}
 
 	void WindowsWindow::Resize(uint32 width, uint32 height)
 	{
-		if (m_FullScreen) return;
+		if (m_FullScreen || m_Maximized || m_Minimized) return;
 		SetWindowPos(hWnd, nullptr, 0, 0, width, height, 0);
 	}
 
