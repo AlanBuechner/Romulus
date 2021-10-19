@@ -13,6 +13,3 @@
 [submodule "Romulus/vendor/yaml-cpp"]
 	path = Romulus/vendor/yaml-cpp
 	url = https://github.com/AlanBuechner/yaml-cpp
-[submodule "Romulus\\vendor\\stb_image"]
-	path = Romulus\\vendor\\stb_image
-	url = https://github.com/AlanBuechner/stb
