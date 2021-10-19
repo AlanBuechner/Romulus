@@ -90,30 +90,26 @@ namespace Engine
 
 	void WindowsWindow::ToggleMinimize()
 	{
-		ShowWindow(hWnd, m_Minimized ? SW_SHOWNORMAL : SW_SHOWMINIMIZED);
+		ShowWindow(hWnd, m_Minimized ? (m_Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL) : SW_SHOWMINIMIZED);
+		m_Minimized = !m_Minimized;
 	}
 
 	void WindowsWindow::ToggleMaximize()
 	{
 		ShowWindow(hWnd, m_Maximized ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
+		m_Maximized = !m_Maximized;
+		m_Minimized = false;
 	}
 
 	void WindowsWindow::ToggleFullScreen()
 	{
-		WINDOWPLACEMENT g_wpPrev = { sizeof(g_wpPrev) };
 		DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
-		if (dwStyle & WS_OVERLAPPEDWINDOW) 
+		if (m_FullScreen) 
 		{
 			MONITORINFO mi = { sizeof(mi) };
-			if (GetWindowPlacement(hWnd, &g_wpPrev) && GetMonitorInfo(MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
+			if (GetMonitorInfo(MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY), &mi))
 			{
 				SetWindowLong(hWnd, GWL_STYLE,dwStyle & ~WS_OVERLAPPEDWINDOW);
-
-				SetWindowPos(hWnd, HWND_TOP,
-					mi.rcMonitor.left, mi.rcMonitor.top,
-					mi.rcMonitor.right - mi.rcMonitor.left,
-					mi.rcMonitor.bottom - mi.rcMonitor.top,
-					SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
 
 				m_FullScreen = true;
 			}
@@ -121,10 +117,8 @@ namespace Engine
 		else 
 		{
 			SetWindowLong(hWnd, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
-			SetWindowPlacement(hWnd, &g_wpPrev);
-			SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
-				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER |
-				SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+
+			ShowWindow(hWnd, m_Minimized ? SW_SHOWMINIMIZED : (m_Maximized ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL));
 
 			m_FullScreen = false;
 		}
