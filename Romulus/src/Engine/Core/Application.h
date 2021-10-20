@@ -15,10 +15,8 @@ namespace Engine
 	private:
 		Ref<Window> m_Window;
 	
-
 	};
 
 	Application* CreateApplication();
-
 
 }

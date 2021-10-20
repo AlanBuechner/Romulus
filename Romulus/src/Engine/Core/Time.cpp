@@ -3,7 +3,7 @@
 #include <chrono>
 
 float Engine::Time::s_DeltaTime = 0.0f;
-float Engine::Time::s_LastFrameTime = Engine::Time::GetTime();
+float Engine::Time::s_LastFrameTime = (float)Engine::Time::GetTime();
 
 namespace Engine
 {
@@ -16,7 +16,7 @@ namespace Engine
 
     void Time::UpdateDeltaTime()
     {
-        float time = GetTime();
+        float time = (float)GetTime();
         s_DeltaTime = time - s_LastFrameTime;
         s_LastFrameTime = time;
 
