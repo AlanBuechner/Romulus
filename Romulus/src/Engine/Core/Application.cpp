@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 #include "Core.h"
+#include "Time.h"
 
 namespace Engine
 {
@@ -16,7 +17,8 @@ namespace Engine
 		{
 			m_Window->OnUpdate();
 			//std::cout << window->IsFullScreen() << window->IsMaximized() << window->IsMinimized() << std::endl;
-			CORE_INFO("{0}, {1}, {2}", m_Window->IsFullScreen(), m_Window->IsMinimized(), m_Window->IsMaximized());
+			//CORE_INFO("{0}, {1}, {2}", m_Window->IsFullScreen(), m_Window->IsMinimized(), m_Window->IsMaximized());
+			CORE_INFO("{0}", Time::GetFPS());
 		}
 
 	}
