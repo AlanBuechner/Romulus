@@ -4,22 +4,19 @@
 #include "Engine\Math\Math.h"
 #include "Cursor.h"
 #include "Log.h"
+#include "Application.h"
 
 #ifdef PLATFORM_WINDOWS
+
+extern Engine::Application* Engine::CreateApplication();
 	
 int main(int argc, char** argv)
 {
 	Engine::Log::Init();
-	Engine::Ref<Engine::Window> window = Engine::Window::Create(1080,720, "Romulus");
 
-	std::cout << "Hello World!" << std::endl;
+	Engine::Application* app = Engine::CreateApplication();
 
-	while (!window->IsWindowClosed())
-	{
-		window->OnUpdate();
-		//std::cout << window->IsFullScreen() << window->IsMaximized() << window->IsMinimized() << std::endl;
-		CORE_INFO("{0}, {1}, {2}", window->IsFullScreen(), window->IsMinimized(), window->IsMaximized());
-	}
+	app->Run();
 
 	return EXIT_SUCCESS;
 }
