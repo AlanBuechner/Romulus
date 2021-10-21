@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-
+#include "Engine\Renderer\SwapChain.h"
 #include <string>
 
 namespace Engine
@@ -40,6 +40,8 @@ namespace Engine
 
 		uint32 m_Width;
 		uint32 m_Height;
+		Scope<SwapChain> m_SwapChain;
+
 
 		bool m_Minimized = false;
 		bool m_Maximized = false;

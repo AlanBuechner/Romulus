@@ -8,6 +8,7 @@
 #ifdef _WIN32 // check if on windows
 	#ifdef _WIN64 // check if windows is 64 bit
 		#define PLATFORM_WINDOWS
+		#define VK_USE_PLATFORM_WIN32_KHR
 	#else
 		#error "x86 Buillds are not sapported" // if not 64 bit throw error
 	#endif // _WIN64

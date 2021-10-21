@@ -2,10 +2,6 @@
 #include "Engine\Core\Core.h"
 #include "Engine\Renderer\RendererAPI.h"
 
-#if defined(PLATFORM_WINDOWS)
-#define VK_USE_PLATFORM_WIN32_KHR
-#endif
-
 #define VK_PROTOTYPES
 #include <vulkan\vulkan.h>
 
@@ -17,7 +13,7 @@ namespace Engine
 	{
 		struct QueueFamilyIndices
 		{
-			std::optional<uint32_t> graphicsFamily;
+			std::optional<uint32> graphicsFamily;
 
 			bool isComplete() { return graphicsFamily.has_value(); }
 		};
@@ -26,11 +22,15 @@ namespace Engine
 		VulkanRendererAPI();
 		~VulkanRendererAPI();
 
+		VkInstance GetInstance() { return m_Instance; }
+		VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
+		QueueFamilyIndices GetDeviceQueueFamilyIndices(VkPhysicalDevice device);
+		VkDevice GetDevice() { return m_Device; }
+
 	private:
 		std::vector<VkPhysicalDevice> GetPhysicalDevices();
 		VkPhysicalDevice GetBestPhysicalDevice();
 
-		QueueFamilyIndices GetDeviceQueueFamilyIndices(VkPhysicalDevice device);
 
 	private:
 		VkInstance m_Instance = VK_NULL_HANDLE;

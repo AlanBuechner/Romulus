@@ -216,6 +216,7 @@ namespace Engine
 			m_Width = LOWORD(lParam);
 			m_Height = HIWORD(lParam);
 			// resize swap chain
+			m_SwapChain->Resize(m_Width, m_Height);
 			break;
 		}
 		case WM_KILLFOCUS: // window remove focuse event

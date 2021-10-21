@@ -13,10 +13,12 @@ namespace Engine
 			return;
 		s_Instance = this;
 
+		// init the renderer
+		Renderer::Init(api);
+
 		// create the main window
 		m_Window = Engine::Window::Create(width, height, title);
 
-		Renderer::Init(api);
 	}
 
 	void Application::Run()

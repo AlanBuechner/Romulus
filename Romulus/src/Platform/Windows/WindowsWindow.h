@@ -32,6 +32,8 @@ namespace Engine
 		virtual void ToggleMaximize() override;
 		virtual void ToggleFullScreen() override;
 
+		HWND GetHWND() { return hWnd; }
+
 	private:
 		static LRESULT WINAPI HandleEventSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // handles seting up events
 		static LRESULT WINAPI HandleEventThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); // sends events to the corisponding window to be handeled
