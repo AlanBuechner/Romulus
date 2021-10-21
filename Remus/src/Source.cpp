@@ -7,7 +7,7 @@ namespace Engine
 	{
 	public:
 		App() :
-			Application("Romulus", 1024, 768)
+			Application("Romulus", 1024, 768, API::Vulkan)
 		{};
 
 		virtual void OnUpdate() override {};

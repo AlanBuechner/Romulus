@@ -7,19 +7,19 @@ float Engine::Time::s_LastFrameTime = (float)Engine::Time::GetTime();
 
 namespace Engine
 {
-    using namespace std::chrono;
+	using namespace std::chrono;
 
-    double Time::GetTime()
-    {
-        return duration<double>(system_clock::now().time_since_epoch()).count();
-    }
+	double Time::GetTime()
+	{
+		return duration<double>(system_clock::now().time_since_epoch()).count();
+	}
 
-    void Time::UpdateDeltaTime()
-    {
-        float time = (float)GetTime();
-        s_DeltaTime = time - s_LastFrameTime;
-        s_LastFrameTime = time;
+	void Time::UpdateDeltaTime()
+	{
+		float time = (float)GetTime();
+		s_DeltaTime = time - s_LastFrameTime;
+		s_LastFrameTime = time;
 
-    }
+	}
 
 }

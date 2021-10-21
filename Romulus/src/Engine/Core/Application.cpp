@@ -7,7 +7,7 @@ Engine::Application* Engine::Application::s_Instance = nullptr;
 
 namespace Engine
 {
-	Application::Application(const std::string& title, uint32 width, uint32 height)
+	Application::Application(const std::string& title, uint32 width, uint32 height, API api)
 	{
 		if (s_Instance != nullptr)
 			return;
@@ -15,6 +15,8 @@ namespace Engine
 
 		// create the main window
 		m_Window = Engine::Window::Create(width, height, title);
+
+		Renderer::Init(api);
 	}
 
 	void Application::Run()
@@ -23,8 +25,10 @@ namespace Engine
 		while (!m_Window->IsWindowClosed())
 		{
 			m_Window->OnUpdate(); // update the window
-			CORE_INFO("{0}", Time::GetFPS());
+			
 		}
+
+		Renderer::Destroy();
 
 	}
 }
