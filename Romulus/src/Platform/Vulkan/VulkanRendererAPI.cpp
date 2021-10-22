@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "VulkanRendererAPI.h"
+#include <set>
 
 // debug call back
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -49,6 +50,8 @@ namespace Engine
 		m_Extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #endif
 
+		m_DeviceExtentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
 		// init application info
 		VkApplicationInfo appInfo{};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -64,13 +67,13 @@ namespace Engine
 		createInfo.pApplicationInfo = &appInfo;
 
 		// enable extentions
-		createInfo.enabledExtensionCount = static_cast<uint32_t>(m_Extentions.size());
+		createInfo.enabledExtensionCount = static_cast<uint32>(m_Extentions.size());
 		createInfo.ppEnabledExtensionNames = m_Extentions.data();
 
 		// enable validation layers
 #if defined(_DEBUG)
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-		createInfo.enabledLayerCount = static_cast<uint32_t>(m_ValidationLayers.size());
+		createInfo.enabledLayerCount = static_cast<uint32>(m_ValidationLayers.size());
 		createInfo.ppEnabledLayerNames = m_ValidationLayers.data();
 
 		PopulateDebugMessengerCreateInfo(debugCreateInfo);
@@ -111,8 +114,10 @@ namespace Engine
 		deviceCreateInfo.enabledExtensionCount = 0;
 
 #if defined(_DEBUG)
-		deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(m_ValidationLayers.size());
+		deviceCreateInfo.enabledLayerCount = static_cast<uint32>(m_ValidationLayers.size());
 		deviceCreateInfo.ppEnabledLayerNames = m_ValidationLayers.data();
+		deviceCreateInfo.enabledExtensionCount = static_cast<uint32>(m_DeviceExtentions.size());
+		deviceCreateInfo.ppEnabledExtensionNames = m_DeviceExtentions.data();
 #else
 		deviceCreateInfo.enabledLayerCount = 0;
 #endif
@@ -130,7 +135,7 @@ namespace Engine
 	std::vector<VkPhysicalDevice> VulkanRendererAPI::GetPhysicalDevices()
 	{
 		// get number of devices
-		uint32_t deviceCount = 0;
+		uint32 deviceCount = 0;
 		vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr);
 		CORE_ASSERT(deviceCount != 0, "No devices with vulkan support found");
 
@@ -149,7 +154,7 @@ namespace Engine
 		// enumerate over all devices and check if it is sutibal
 		for (const auto& device : devices) 
 		{
-			if (GetDeviceQueueFamilyIndices(device).isComplete()) 
+			if (GetDeviceQueueFamilyIndices(device).isComplete() && checkDeviceExtensionSupport(device)) 
 			{
 				gpu = device;
 				break;
@@ -159,11 +164,27 @@ namespace Engine
 		return gpu;
 	}
 
+	bool VulkanRendererAPI::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+		uint32 extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(m_DeviceExtentions.begin(), m_DeviceExtentions.end());
+
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
+
 	VulkanRendererAPI::QueueFamilyIndices VulkanRendererAPI::GetDeviceQueueFamilyIndices(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
 
-		uint32_t queueFamilyCount = 0;
+		uint32 queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
 		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);

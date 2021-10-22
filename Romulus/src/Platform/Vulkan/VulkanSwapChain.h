@@ -14,10 +14,18 @@ namespace Engine
 		~VulkanSwapChain();
 
 		virtual void Resize(uint32 width, uint32 height) override;
+
+	private:
+		void DestroyImages();
 		
 	private:
 		VkSurfaceKHR m_WindowSurface = VK_NULL_HANDLE;
 		VkSurfaceFormatKHR m_SurfaceFormat = {};
+
+		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
+
+		std::vector<VkImage> m_Images;
+		std::vector<VkImageView> m_ImageViews;
 
 	};
 }

@@ -9,9 +9,7 @@ namespace Engine
 {
 	Window::Window(uint32 width, uint32 height, const std::string& title) :
 		m_Width(width), m_Height(height), m_Title(title)
-	{
-		m_SwapChain = SwapChain::Create(width, height, this);
-	}
+	{}
 
 	Ref<Window> Window::Create(uint32 width, uint32 height, const std::string& title)
 	{

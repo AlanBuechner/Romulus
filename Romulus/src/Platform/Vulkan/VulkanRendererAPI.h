@@ -30,6 +30,7 @@ namespace Engine
 	private:
 		std::vector<VkPhysicalDevice> GetPhysicalDevices();
 		VkPhysicalDevice GetBestPhysicalDevice();
+		bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
 
 	private:
@@ -39,6 +40,7 @@ namespace Engine
 
 		std::vector<const char*> m_ValidationLayers;
 		std::vector<const char*> m_Extentions;
+		std::vector<const char*> m_DeviceExtentions;
 	};
 }
 

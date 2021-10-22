@@ -32,14 +32,13 @@ namespace Engine
 		);
 
 		// check if the windows was created successfuly
-		if (hWnd == nullptr)
-		{
-			std::cout << "Error: cannot create window";
-			__debugbreak();
-		}
+		CORE_ASSERT(hWnd != nullptr, "Failed to create window");
+		// create the swap chain
+		m_SwapChain = SwapChain::Create(width, height, this);
 
 		// show the window
 		ShowWindow(hWnd, SW_SHOW);
+
 	}
 
 	WindowsWindow::~WindowsWindow()
