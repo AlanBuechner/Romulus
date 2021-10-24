@@ -27,6 +27,11 @@ namespace Engine
 		std::vector<VkImage> m_Images;
 		std::vector<VkImageView> m_ImageViews;
 
+		VkImage m_DepthStencilBuffer = VK_NULL_HANDLE;
+		VkImageView m_DepthStencilView = VK_NULL_HANDLE;
+		VkFormat m_DepthSetncilFormat = VK_FORMAT_UNDEFINED;
+		VkDeviceMemory m_DepthStencilMemory;
+
 	};
 }
 

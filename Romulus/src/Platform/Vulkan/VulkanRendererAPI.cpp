@@ -90,6 +90,8 @@ namespace Engine
 		m_PhysicalDevice = GetBestPhysicalDevice();
 		CORE_ASSERT(m_PhysicalDevice != VK_NULL_HANDLE, "Could not get a sutable device!");
 
+		vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &m_MemoryProps);
+
 		// create device
 		QueueFamilyIndices indices = GetDeviceQueueFamilyIndices(m_PhysicalDevice);
 

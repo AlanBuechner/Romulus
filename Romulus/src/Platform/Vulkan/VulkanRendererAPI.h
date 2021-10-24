@@ -24,6 +24,7 @@ namespace Engine
 
 		VkInstance GetInstance() { return m_Instance; }
 		VkPhysicalDevice GetPhysicalDevice() { return m_PhysicalDevice; }
+		VkPhysicalDeviceMemoryProperties GetMemoryProps() { return m_MemoryProps; }
 		QueueFamilyIndices GetDeviceQueueFamilyIndices(VkPhysicalDevice device);
 		VkDevice GetDevice() { return m_Device; }
 
@@ -37,6 +38,8 @@ namespace Engine
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_Device = VK_NULL_HANDLE;
+
+		VkPhysicalDeviceMemoryProperties m_MemoryProps;
 
 		std::vector<const char*> m_ValidationLayers;
 		std::vector<const char*> m_Extentions;
