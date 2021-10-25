@@ -2,6 +2,8 @@
 #include "Engine\Core\Core.h"
 #include "Engine\Renderer\FrameBuffer.h"
 
+#include <vulkan\vulkan.h>
+
 namespace Engine
 {
 	class VulkanFrameBuffer : public FrameBuffer
@@ -14,6 +16,10 @@ namespace Engine
 		virtual void BindToRenderPass(RenderPass& renderPass) override;
 
 	private:
+		void DestroyFrameBuffer();
+
+	private:
+		VkFramebuffer m_FrameBuffer = VK_NULL_HANDLE;
 		
 	};
 }

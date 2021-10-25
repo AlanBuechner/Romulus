@@ -13,6 +13,8 @@ namespace Engine
 
 		virtual void GenerateRenderPass() override;
 
+		inline VkRenderPass GetRenderPass() { return m_RenderPass; }
+
 	private:
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
 

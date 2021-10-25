@@ -14,6 +14,7 @@ namespace Engine
 
 		inline VkFormat GetVulkanFormat() const { return m_ImageFormat; }
 		inline VkImageLayout GetVulkanLayout() const { return m_Layout; }
+		inline VkImageView GetView() const { return m_ImageView; }
 
 		inline void SetVulkanLayout(VkImageLayout layout) { m_Layout = layout; }
 

@@ -27,5 +27,6 @@ namespace Engine
 
 	protected:
 		std::vector<FrameBufferAttachments> m_Attachments;
+		uint32 m_Width, m_Height;
 	};
 }
