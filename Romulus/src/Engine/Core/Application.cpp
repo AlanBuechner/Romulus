@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Core.h"
 #include "Time.h"
+#include "Engine\Renderer\RenderPass.h"
 
 Engine::Application* Engine::Application::s_Instance = nullptr;
 
@@ -23,6 +24,12 @@ namespace Engine
 
 	void Application::Run()
 	{
+		Ref<RenderPass> renderPass = RenderPass::Create();
+		renderPass->m_RenderPassType = RenderPass::RenderPassType::Forword;
+		renderPass->m_ClearType = RenderPass::ClearType::Color;
+		renderPass->m_ClearColor = {1.0f, 0.0f, 0.0f, 1.0f};
+		renderPass->GenerateRenderPass();
+
 		// main game loop
 		while (!m_Window->IsWindowClosed())
 		{

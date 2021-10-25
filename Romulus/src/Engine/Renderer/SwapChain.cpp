@@ -6,18 +6,17 @@
 
 namespace Engine
 {
-    Scope<SwapChain> SwapChain::Create(uint32 width, uint32 height, void* window)
-    {
-        switch (RendererCommand::GetApi())
-        {
-        case API::Vulkan:
-            return CreateScope<VulkanSwapChain>(width, height, window);
-            break;
-        default:
-            break;
-        }
+	Scope<SwapChain> SwapChain::Create(uint32 width, uint32 height, void* window)
+	{
+		switch (RendererCommand::GetApi())
+		{
+		case API::Vulkan:
+			return CreateScope<VulkanSwapChain>(width, height, window);
+		default:
+			break;
+		}
 
-        return Scope<SwapChain>();
-    }
+		return Scope<SwapChain>();
+	}
 
 }

@@ -1,8 +1,10 @@
 #pragma once
 #include "Engine\Core\Core.h"
 #include "Engine\Renderer\SwapChain.h"
+#include "Engine\Renderer\FrameBuffer.h"
 
-#define VK_PROTOTYPES
+#include "VulkanTexture.h"
+
 #include <vulkan\vulkan.h>
 
 namespace Engine
@@ -10,13 +12,12 @@ namespace Engine
 	class VulkanSwapChain : public SwapChain
 	{
 	public:
+		VulkanSwapChain() = delete;
 		VulkanSwapChain(uint32 width, uint32 height, void* window);
 		~VulkanSwapChain();
 
 		virtual void Resize(uint32 width, uint32 height) override;
-
-	private:
-		void DestroyImages();
+		virtual Ref<FrameBuffer> GetFrontBuffer() override;
 		
 	private:
 		VkSurfaceKHR m_WindowSurface = VK_NULL_HANDLE;
@@ -24,13 +25,11 @@ namespace Engine
 
 		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
 
-		std::vector<VkImage> m_Images;
-		std::vector<VkImageView> m_ImageViews;
+		std::vector<Ref<Texture>> m_Images;
 
-		VkImage m_DepthStencilBuffer = VK_NULL_HANDLE;
-		VkImageView m_DepthStencilView = VK_NULL_HANDLE;
-		VkFormat m_DepthSetncilFormat = VK_FORMAT_UNDEFINED;
-		VkDeviceMemory m_DepthStencilMemory;
+		Ref<Texture> m_DepthStencilImage;
+
+		std::vector<Ref<FrameBuffer>> m_FrameBuffers;
 
 	};
 }

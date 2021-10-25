@@ -34,6 +34,8 @@ namespace Engine
 		virtual void ToggleMaximize() = 0;
 		virtual void ToggleFullScreen() = 0;
 
+		inline SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
+
 		static Ref<Window> Create(uint32 width, uint32 height, const std::string& title);
 
 	protected:
