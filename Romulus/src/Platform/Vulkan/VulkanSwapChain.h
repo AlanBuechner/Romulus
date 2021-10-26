@@ -17,7 +17,9 @@ namespace Engine
 		~VulkanSwapChain();
 
 		virtual void Resize(uint32 width, uint32 height) override;
-		virtual Ref<FrameBuffer> GetFrontBuffer() override;
+		virtual Ref<FrameBuffer> GetBackBuffer() override;
+
+		virtual void Swap() override;
 		
 	private:
 		VkSurfaceKHR m_WindowSurface = VK_NULL_HANDLE;
@@ -26,11 +28,11 @@ namespace Engine
 		VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
 
 		std::vector<Ref<Texture>> m_Images;
-
 		Ref<Texture> m_DepthStencilImage;
-
 		std::vector<Ref<FrameBuffer>> m_FrameBuffers;
 
+		uint32 m_FrontIndex = 0;
+		VkFence m_AquireFence = VK_NULL_HANDLE;
 	};
 }
 

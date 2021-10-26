@@ -3,6 +3,10 @@
 #include "Core.h"
 #include "Time.h"
 #include "Engine\Renderer\RenderPass.h"
+#include "Engine\Renderer\RendererCommand.h"
+#include "Platform\Vulkan\VulkanRendererAPI.h"
+
+#include <vulkan\vulkan.h>
 
 Engine::Application* Engine::Application::s_Instance = nullptr;
 
@@ -33,8 +37,10 @@ namespace Engine
 		// main game loop
 		while (!m_Window->IsWindowClosed())
 		{
-			m_Window->OnUpdate(); // update the window
-			
+
+			CORE_INFO("{0}", Time::GetFPS());
+			renderPass->Run();
+			m_Window->OnUpdate(); // update the window	
 		}
 
 		Renderer::Destroy();

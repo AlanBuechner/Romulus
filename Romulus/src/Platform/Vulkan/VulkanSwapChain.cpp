@@ -160,6 +160,9 @@ namespace Engine
 	VulkanSwapChain::~VulkanSwapChain()
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+		if (m_AquireFence != VK_NULL_HANDLE)
+			vkDestroyFence(api.GetDevice(), m_AquireFence, nullptr);
+
 		m_Images.clear();
 		vkDestroySwapchainKHR(api.GetDevice(), m_SwapChain, nullptr);
 		vkDestroySurfaceKHR(api.GetInstance(), m_WindowSurface, nullptr);
@@ -170,9 +173,44 @@ namespace Engine
 
 	}
 
-	Ref<FrameBuffer> VulkanSwapChain::GetFrontBuffer()
+	Ref<FrameBuffer> VulkanSwapChain::GetBackBuffer()
 	{
-		return m_FrameBuffers[0];
+		return m_FrameBuffers[m_FrontIndex];
+	}
+
+	void VulkanSwapChain::Swap()
+	{
+		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+		if (m_AquireFence == VK_NULL_HANDLE)
+		{
+			VkFenceCreateInfo info{};
+			info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			vkCreateFence(api.GetDevice(), &info, nullptr, &m_AquireFence);
+		}
+
+		// get the next image 
+		CORE_ASSERT(vkAcquireNextImageKHR(api.GetDevice(), m_SwapChain, UINT64_MAX, 0, m_AquireFence, &m_FrontIndex) == VK_SUCCESS,
+			"failed to get next image");
+
+		// present the image
+		VkResult presentResult = VkResult::VK_RESULT_MAX_ENUM;
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.waitSemaphoreCount = 0;
+		presentInfo.pWaitSemaphores = nullptr;
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = &m_SwapChain;
+		presentInfo.pImageIndices = &m_FrontIndex;
+		presentInfo.pResults = &presentResult;
+		CORE_ASSERT(vkQueuePresentKHR(api.GetQueue(), &presentInfo) == VK_SUCCESS,
+			"failed to present image");
+		CORE_ASSERT(presentResult == VK_SUCCESS, "failed to present image")
+
+		// wait for v-sync
+		vkWaitForFences(api.GetDevice(), 1, &m_AquireFence, VK_TRUE, UINT64_MAX);
+		vkResetFences(api.GetDevice(), 1, &m_AquireFence);
+		vkQueueWaitIdle(api.GetQueue());
+
 	}
 
 }

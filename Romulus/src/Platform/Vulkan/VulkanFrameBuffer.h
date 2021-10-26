@@ -15,6 +15,8 @@ namespace Engine
 
 		virtual void BindToRenderPass(RenderPass& renderPass) override;
 
+		VkFramebuffer GetVulkanFrameBuffer() { return m_FrameBuffer; }
+
 	private:
 		void DestroyFrameBuffer();
 

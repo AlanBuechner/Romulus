@@ -23,6 +23,8 @@ namespace Engine
 
 		virtual void GenerateRenderPass() = 0;
 
+		virtual void Run() = 0;
+
 		static Ref<RenderPass> Create();
 
 	public:

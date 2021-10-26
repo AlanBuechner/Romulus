@@ -21,13 +21,10 @@ namespace Engine
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 		
 		// get the destination frame buffer
-		bool destIsSwap = false;
 		Ref<FrameBuffer> destBuffer = m_DestinationBuffer;
 		if (!destBuffer) // if not desitnation buffer is specified draw the the swap chins front buffer
-		{
-			destBuffer = Application::GetWindow()->GetSwapChain().GetFrontBuffer();
-			destIsSwap = true;
-		}
+			destBuffer = Application::GetWindow()->GetSwapChain().GetBackBuffer();
+		
 
 		// get the attachments for the destination frame buffer
 		std::vector<FrameBufferAttachments>& frameAttachments = destBuffer->GetAttachments();
@@ -117,8 +114,77 @@ namespace Engine
 		CORE_ASSERT(vkCreateRenderPass(api.GetDevice(), &rpCreateInfo, nullptr, &m_RenderPass) == VK_SUCCESS,
 			"failed to create render pass");
 
+
+		// create command pool
+		VkCommandPoolCreateInfo poolCreateInfo{};
+		poolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		poolCreateInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		poolCreateInfo.queueFamilyIndex = api.GetDeviceQueueFamilyIndices(api.GetPhysicalDevice()).graphicsFamily.value();
+
+		CORE_ASSERT(vkCreateCommandPool(api.GetDevice(), &poolCreateInfo, nullptr, &m_Pool) == VK_SUCCESS,
+			"failed to create command pool");
+
+		// create command buffer
+		VkCommandBufferAllocateInfo allocateInfo{};
+		allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocateInfo.commandPool = m_Pool;
+		allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocateInfo.commandBufferCount = 1;
+
+		CORE_ASSERT(vkAllocateCommandBuffers(api.GetDevice(), &allocateInfo, &m_ClearBuffer) == VK_SUCCESS,
+			"failed to allocate memory for command buffers");
+
+	}
+
+	void VulkanRenderPass::Run()
+	{
+		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+
 		// bind the frame buffer to the render pass
+		Ref<FrameBuffer> destBuffer = m_DestinationBuffer;
+		if (!destBuffer) // if not desitnation buffer is specified draw the the swap chins front buffer
+			destBuffer = Application::GetWindow()->GetSwapChain().GetBackBuffer();
 		destBuffer->BindToRenderPass(*this);
+
+		VkCommandBufferBeginInfo clearInfo{};
+		clearInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		clearInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		CORE_ASSERT(vkBeginCommandBuffer(m_ClearBuffer, &clearInfo) == VK_SUCCESS,
+			"failed to begin command buffer");
+
+		std::array<VkClearValue, 2> clearColor{};
+		clearColor[0].color.float32[0] = m_ClearColor.r;
+		clearColor[0].color.float32[1] = m_ClearColor.g;
+		clearColor[0].color.float32[2] = m_ClearColor.b;
+		clearColor[0].color.float32[3] = m_ClearColor.a;
+		clearColor[1].depthStencil = { 0.0f , 0 };
+
+		VkRenderPassBeginInfo beginRenderPassInfo{};
+		beginRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		beginRenderPassInfo.renderPass = m_RenderPass;
+		beginRenderPassInfo.framebuffer = (*(VulkanFrameBuffer*)destBuffer.get()).GetVulkanFrameBuffer();
+		beginRenderPassInfo.renderArea = { {0, 0}, {destBuffer->GetWidth(), destBuffer->GetHeight()} };
+		beginRenderPassInfo.clearValueCount = (uint32)clearColor.size();
+		beginRenderPassInfo.pClearValues = clearColor.data();
+
+		vkCmdBeginRenderPass(m_ClearBuffer, &beginRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		vkCmdEndRenderPass(m_ClearBuffer);
+
+		vkEndCommandBuffer(m_ClearBuffer);
+
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.waitSemaphoreCount = 0;
+		submitInfo.pWaitSemaphores = nullptr;
+		submitInfo.pWaitDstStageMask = nullptr;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &m_ClearBuffer;
+		submitInfo.signalSemaphoreCount = 0;
+		submitInfo.pSignalSemaphores = nullptr;
+
+		vkQueueSubmit(api.GetQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
 	}
 
 

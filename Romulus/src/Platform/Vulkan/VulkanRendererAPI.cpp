@@ -124,7 +124,9 @@ namespace Engine
 		deviceCreateInfo.enabledLayerCount = 0;
 #endif
 
-		CORE_ASSERT(vkCreateDevice(m_PhysicalDevice, &deviceCreateInfo, nullptr, &m_Device) == VK_SUCCESS, "Failded to create device");
+		CORE_ASSERT(vkCreateDevice(m_PhysicalDevice, &deviceCreateInfo, nullptr, &m_Device) == VK_SUCCESS, 
+			"Failded to create device");
+		vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_Queue);
 
 	}
 

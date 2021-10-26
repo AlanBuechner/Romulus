@@ -58,7 +58,7 @@ namespace Engine
 
 
 		// swap the frame buffers
-
+		m_SwapChain->Swap();
 	}
 
 	void WindowsWindow::Close()

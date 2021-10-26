@@ -12,11 +12,15 @@ namespace Engine
 		~VulkanRenderPass();
 
 		virtual void GenerateRenderPass() override;
+		virtual void Run() override;
 
 		inline VkRenderPass GetRenderPass() { return m_RenderPass; }
 
 	private:
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
+
+		VkCommandPool m_Pool;
+		VkCommandBuffer m_ClearBuffer = VK_NULL_HANDLE;
 
 	};
 }

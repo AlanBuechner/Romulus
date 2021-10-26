@@ -27,6 +27,7 @@ namespace Engine
 		VkPhysicalDeviceMemoryProperties GetMemoryProps() { return m_MemoryProps; }
 		QueueFamilyIndices GetDeviceQueueFamilyIndices(VkPhysicalDevice device);
 		VkDevice GetDevice() { return m_Device; }
+		VkQueue GetQueue() { return m_Queue; }
 
 	private:
 		std::vector<VkPhysicalDevice> GetPhysicalDevices();
@@ -38,6 +39,7 @@ namespace Engine
 		VkInstance m_Instance = VK_NULL_HANDLE;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_Device = VK_NULL_HANDLE;
+		VkQueue m_Queue;
 
 		VkPhysicalDeviceMemoryProperties m_MemoryProps;
 
