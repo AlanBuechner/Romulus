@@ -17,6 +17,7 @@ namespace Engine
 		virtual void Close() = 0;
 
 		virtual bool IsWindowClosed() = 0;
+		virtual bool WantToClose() { return m_WantToClose; }
 
 		inline uint32_t GetWidth() { return m_Width; }
 		inline uint32_t GetHeight() { return m_Height; }
@@ -42,6 +43,7 @@ namespace Engine
 
 		uint32 m_Width;
 		uint32 m_Height;
+		bool m_WantToClose = false;
 		Scope<SwapChain> m_SwapChain;
 
 

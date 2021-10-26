@@ -195,9 +195,12 @@ namespace Engine
 		presentInfo.pSwapchains = &m_SwapChain;
 		presentInfo.pImageIndices = &m_FrontIndex;
 		presentInfo.pResults = &presentResult;
-		CORE_ASSERT(vkQueuePresentKHR(api.GetQueue(), &presentInfo) == VK_SUCCESS,
+		VkResult result = vkQueuePresentKHR(api.GetQueue(), &presentInfo);
+		CORE_ASSERT(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR,
 			"failed to present image");
-		CORE_ASSERT(presentResult == VK_SUCCESS, "failed to present image");
+		if (result == VK_SUBOPTIMAL_KHR)
+			CORE_WARN("swapchain no longer matches window surface but can still be presented");
+		CORE_ASSERT(presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR, "failed to present image");
 
 		// get the next image
 		GetNextImage();
@@ -216,8 +219,10 @@ namespace Engine
 		}
 
 		// get the next image 
-		CORE_ASSERT(vkAcquireNextImageKHR(api.GetDevice(), m_SwapChain, UINT64_MAX, 0, m_AquireFence, &m_FrontIndex) == VK_SUCCESS,
-			"failed to get next image");
+		VkResult result = vkAcquireNextImageKHR(api.GetDevice(), m_SwapChain, UINT64_MAX, 0, m_AquireFence, &m_FrontIndex);
+		CORE_ASSERT(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "failed to get next image");
+		if (result == VK_SUBOPTIMAL_KHR)
+			CORE_WARN("swapchain no loger matches window surface but can still be acquired");
 
 		// wait for v-sync
 		vkWaitForFences(api.GetDevice(), 1, &m_AquireFence, VK_TRUE, UINT64_MAX);

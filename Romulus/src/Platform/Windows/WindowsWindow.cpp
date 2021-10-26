@@ -221,6 +221,8 @@ namespace Engine
 		case WM_KILLFOCUS: // window remove focuse event
 			break;
 		case WM_CLOSE: // window close event
+			m_WantToClose = true;
+			return true;
 			break;
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);

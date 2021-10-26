@@ -11,6 +11,7 @@ namespace Engine
 
 	public:
 		Application(const std::string& title, uint32 width, uint32 height, API api);
+		~Application();
 
 		static Application* Get() { return s_Instance; }
 		static Ref<Window> GetWindow() { return s_Instance->m_Window; }

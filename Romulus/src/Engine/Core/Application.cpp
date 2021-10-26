@@ -26,6 +26,12 @@ namespace Engine
 
 	}
 
+	Application::~Application()
+	{
+		m_Window->Close();
+		Renderer::Destroy();
+	}
+
 	void Application::Run()
 	{
 		Ref<RenderPass> renderPass = RenderPass::Create();
@@ -35,13 +41,11 @@ namespace Engine
 		renderPass->GenerateRenderPass();
 
 		// main game loop
-		while (!m_Window->IsWindowClosed())
+		while (!m_Window->WantToClose())
 		{
 			renderPass->Run();
 			m_Window->OnUpdate(); // update the window
 		}
-
-		Renderer::Destroy();
 
 	}
 }
