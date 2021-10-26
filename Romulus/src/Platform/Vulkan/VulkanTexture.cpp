@@ -149,8 +149,11 @@ namespace Engine
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 		vkDestroyImageView(api.GetDevice(), m_ImageView, nullptr);
-		vkFreeMemory(api.GetDevice(), m_ImageMemory, nullptr);
-		vkDestroyImage(api.GetDevice(), m_ImageBuffer, nullptr);
+		if (m_Format != TextureFormat::Screen)
+		{
+			vkFreeMemory(api.GetDevice(), m_ImageMemory, nullptr);
+			vkDestroyImage(api.GetDevice(), m_ImageBuffer, nullptr);
+		}
 	}
 
 	void VulkanTexture::CreateImage(uint32 width, uint32 height, VkImage image, VkImageView view, VkFormat vFormat, VkDeviceMemory memory, VkImageLayout vLayout, TextureFormat format)

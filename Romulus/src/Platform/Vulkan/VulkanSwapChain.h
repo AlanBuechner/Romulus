@@ -20,6 +20,9 @@ namespace Engine
 		virtual Ref<FrameBuffer> GetBackBuffer() override;
 
 		virtual void Swap() override;
+
+	private:
+		void GetNextImage();
 		
 	private:
 		VkSurfaceKHR m_WindowSurface = VK_NULL_HANDLE;

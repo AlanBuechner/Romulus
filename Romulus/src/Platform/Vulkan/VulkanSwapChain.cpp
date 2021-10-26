@@ -155,6 +155,9 @@ namespace Engine
 			m_FrameBuffers[i] = FrameBuffer::Create(width, height, attachments);
 		}
 
+		// get the first image
+		GetNextImage();
+
 	}
 
 	VulkanSwapChain::~VulkanSwapChain()
@@ -181,16 +184,6 @@ namespace Engine
 	void VulkanSwapChain::Swap()
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
-		if (m_AquireFence == VK_NULL_HANDLE)
-		{
-			VkFenceCreateInfo info{};
-			info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-			vkCreateFence(api.GetDevice(), &info, nullptr, &m_AquireFence);
-		}
-
-		// get the next image 
-		CORE_ASSERT(vkAcquireNextImageKHR(api.GetDevice(), m_SwapChain, UINT64_MAX, 0, m_AquireFence, &m_FrontIndex) == VK_SUCCESS,
-			"failed to get next image");
 
 		// present the image
 		VkResult presentResult = VkResult::VK_RESULT_MAX_ENUM;
@@ -204,7 +197,27 @@ namespace Engine
 		presentInfo.pResults = &presentResult;
 		CORE_ASSERT(vkQueuePresentKHR(api.GetQueue(), &presentInfo) == VK_SUCCESS,
 			"failed to present image");
-		CORE_ASSERT(presentResult == VK_SUCCESS, "failed to present image")
+		CORE_ASSERT(presentResult == VK_SUCCESS, "failed to present image");
+
+		// get the next image
+		GetNextImage();
+		
+	}
+
+	void VulkanSwapChain::GetNextImage()
+	{
+		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+
+		if (m_AquireFence == VK_NULL_HANDLE)
+		{
+			VkFenceCreateInfo info{};
+			info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			vkCreateFence(api.GetDevice(), &info, nullptr, &m_AquireFence);
+		}
+
+		// get the next image 
+		CORE_ASSERT(vkAcquireNextImageKHR(api.GetDevice(), m_SwapChain, UINT64_MAX, 0, m_AquireFence, &m_FrontIndex) == VK_SUCCESS,
+			"failed to get next image");
 
 		// wait for v-sync
 		vkWaitForFences(api.GetDevice(), 1, &m_AquireFence, VK_TRUE, UINT64_MAX);

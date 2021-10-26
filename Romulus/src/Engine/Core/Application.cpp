@@ -37,10 +37,8 @@ namespace Engine
 		// main game loop
 		while (!m_Window->IsWindowClosed())
 		{
-
-			CORE_INFO("{0}", Time::GetFPS());
 			renderPass->Run();
-			m_Window->OnUpdate(); // update the window	
+			m_Window->OnUpdate(); // update the window
 		}
 
 		Renderer::Destroy();
