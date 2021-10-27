@@ -9,11 +9,10 @@ namespace Engine
 	public:
 
 		void Resize(uint32 width, uint32 height);
-		virtual void Regenerate() = 0;
+		virtual void Update() = 0;
 		virtual Ref<FrameBuffer> GetBackBuffer() = 0;
 
 		virtual void Swap() = 0;
-		virtual void GetNextImage() = 0;
 
 		static Scope<SwapChain> Create(uint32 width, uint32 height, void* window);
 

@@ -24,13 +24,13 @@ namespace Engine
 		DestroySwapChain();
 	}
 
-	void VulkanSwapChain::Regenerate()
+	void VulkanSwapChain::Update()
 	{
-		// destroy the last swap chain
-		DestroySwapChain();
-
-		// recreate swapchain 
-		GenSwapChain(m_NewWidth, m_NewHeight);
+		if (m_Regenerate)
+		{
+			DestroySwapChain();
+			GenSwapChain(m_NewWidth, m_NewHeight);
+		}
 
 		GetNextImage();
 	}
@@ -42,8 +42,6 @@ namespace Engine
 
 	void VulkanSwapChain::Swap()
 	{
-		if (!m_Regenerate)
-			return;
 
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 
@@ -209,6 +207,8 @@ namespace Engine
 
 			m_FrameBuffers[i] = FrameBuffer::Create(width, height, attachments);
 		}
+
+		CORE_INFO("regenerating window");
 
 		m_Regenerate = false;
 	}

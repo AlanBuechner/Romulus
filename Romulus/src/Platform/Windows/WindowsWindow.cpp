@@ -60,7 +60,8 @@ namespace Engine
 			DispatchMessage(&msg);
 		}
 
-		m_SwapChain->Regenerate();
+		if(!m_Minimized)
+			m_SwapChain->Update();
 	}
 
 	void WindowsWindow::Close()

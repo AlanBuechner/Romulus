@@ -43,7 +43,12 @@ namespace Engine
 		// main game loop
 		while (!m_Window->WantToClose())
 		{
-			renderPass->Run();
+			Time::UpdateDeltaTime();
+			if (!m_Window->IsMinimized())
+			{
+				renderPass->Run();
+
+			}
 			m_Window->OnUpdate(); // update the window
 		}
 

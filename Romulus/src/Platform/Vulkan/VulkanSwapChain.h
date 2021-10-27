@@ -16,14 +16,14 @@ namespace Engine
 		VulkanSwapChain(uint32 width, uint32 height, void* window);
 		~VulkanSwapChain();
 
-		virtual void Regenerate() override;
+		virtual void Update() override;
 		virtual Ref<FrameBuffer> GetBackBuffer() override;
 
 		virtual void Swap() override;
-		virtual void GetNextImage() override;
 
 	private:
 
+		void GetNextImage();
 		void GenSwapChain(uint32 width, uint32 height);
 		void DestroySwapChain();
 
