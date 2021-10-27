@@ -15,6 +15,8 @@ namespace Engine
 	VulkanSwapChain::VulkanSwapChain(uint32 width, uint32 height, void* window)
 	{
 		m_Window = window;
+		GenSwapChain(width, height);
+		GetNextImage();
 	}
 
 	VulkanSwapChain::~VulkanSwapChain()
@@ -22,12 +24,15 @@ namespace Engine
 		DestroySwapChain();
 	}
 
-	void VulkanSwapChain::Resize(uint32 width, uint32 height)
+	void VulkanSwapChain::Regenerate()
 	{
+		// destroy the last swap chain
 		DestroySwapChain();
 
-		GenSwapChain(width, height);
+		// recreate swapchain 
+		GenSwapChain(m_NewWidth, m_NewHeight);
 
+		GetNextImage();
 	}
 
 	Ref<FrameBuffer> VulkanSwapChain::GetBackBuffer()
@@ -37,6 +42,9 @@ namespace Engine
 
 	void VulkanSwapChain::Swap()
 	{
+		if (!m_Regenerate)
+			return;
+
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 
 		// present the image
@@ -55,9 +63,6 @@ namespace Engine
 		if (result == VK_SUBOPTIMAL_KHR)
 			CORE_WARN("swapchain no longer matches window surface but can still be presented");
 		CORE_ASSERT(presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR, "failed to present image");
-
-		// get the next image
-		GetNextImage();
 		
 	}
 
@@ -205,8 +210,7 @@ namespace Engine
 			m_FrameBuffers[i] = FrameBuffer::Create(width, height, attachments);
 		}
 
-		// get the first image
-		GetNextImage();
+		m_Regenerate = false;
 	}
 
 	void VulkanSwapChain::DestroySwapChain()

@@ -48,6 +48,10 @@ namespace Engine
 
 	void WindowsWindow::OnUpdate()
 	{
+		// swap the frame buffers
+		if(!m_Minimized)
+			m_SwapChain->Swap();
+
 		// pull events
 		MSG msg;
 		BOOL gResult = PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE);
@@ -56,8 +60,7 @@ namespace Engine
 			DispatchMessage(&msg);
 		}
 
-		// swap the frame buffers
-		m_SwapChain->Swap();
+		m_SwapChain->Regenerate();
 	}
 
 	void WindowsWindow::Close()
@@ -210,11 +213,14 @@ namespace Engine
 			
 			}
 
-			// set the width and hight
-			m_Width = LOWORD(lParam);
-			m_Height = HIWORD(lParam);
-			// resize swap chain
-			m_SwapChain->Resize(m_Width, m_Height);
+			if (!m_Minimized)
+			{
+				// set the width and hight
+				m_Width = LOWORD(lParam);
+				m_Height = HIWORD(lParam);
+				// resize swap chain
+				m_SwapChain->Resize(m_Width, m_Height);
+			}
 			break;
 		}
 		case WM_KILLFOCUS: // window remove focuse event
