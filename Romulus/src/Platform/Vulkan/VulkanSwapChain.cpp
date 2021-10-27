@@ -14,17 +14,67 @@ namespace Engine
 
 	VulkanSwapChain::VulkanSwapChain(uint32 width, uint32 height, void* window)
 	{
+		m_Window = window;
+	}
+
+	VulkanSwapChain::~VulkanSwapChain()
+	{
+		DestroySwapChain();
+	}
+
+	void VulkanSwapChain::Resize(uint32 width, uint32 height)
+	{
+		DestroySwapChain();
+
+		GenSwapChain(width, height);
+
+	}
+
+	Ref<FrameBuffer> VulkanSwapChain::GetBackBuffer()
+	{
+		return m_FrameBuffers[m_FrontIndex];
+	}
+
+	void VulkanSwapChain::Swap()
+	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 
+		// present the image
+		VkResult presentResult = VkResult::VK_RESULT_MAX_ENUM;
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+		presentInfo.waitSemaphoreCount = 0;
+		presentInfo.pWaitSemaphores = nullptr;
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = &m_SwapChain;
+		presentInfo.pImageIndices = &m_FrontIndex;
+		presentInfo.pResults = &presentResult;
+		VkResult result = vkQueuePresentKHR(api.GetQueue(), &presentInfo);
+		CORE_ASSERT(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR,
+			"failed to present image");
+		if (result == VK_SUBOPTIMAL_KHR)
+			CORE_WARN("swapchain no longer matches window surface but can still be presented");
+		CORE_ASSERT(presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR, "failed to present image");
+
+		// get the next image
+		GetNextImage();
+		
+	}
+
+	void VulkanSwapChain::GenSwapChain(uint32 width, uint32 height)
+	{
+		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+
+		// create the window surface
 #if defined(PLATFORM_WINDOWS)
-		WindowsWindow& win = *(WindowsWindow*)window;
+		WindowsWindow& win = *(WindowsWindow*)m_Window;
 
 		VkWin32SurfaceCreateInfoKHR createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		createInfo.hinstance = GetModuleHandle(nullptr);
 		createInfo.hwnd = win.GetHWND();
 
-		CORE_ASSERT(vkCreateWin32SurfaceKHR(api.GetInstance(), &createInfo, nullptr, &m_WindowSurface) == VK_SUCCESS, 
+		CORE_ASSERT(vkCreateWin32SurfaceKHR(api.GetInstance(), &createInfo, nullptr, &m_WindowSurface) == VK_SUCCESS,
 			"Failded to create window surface");
 #endif
 
@@ -48,7 +98,7 @@ namespace Engine
 		vkGetPhysicalDeviceSurfaceFormatsKHR(pDevice, m_WindowSurface, &formatCount, nullptr);
 		CORE_ASSERT(formatCount != 0, "no suface formats");
 
-		std::vector< VkSurfaceFormatKHR> surfaceFormats{formatCount};
+		std::vector< VkSurfaceFormatKHR> surfaceFormats{ formatCount };
 		vkGetPhysicalDeviceSurfaceFormatsKHR(pDevice, m_WindowSurface, &formatCount, surfaceFormats.data());
 		if (surfaceFormats[0].format == VK_FORMAT_UNDEFINED)
 		{
@@ -85,7 +135,7 @@ namespace Engine
 		swapCreateInfo.minImageCount = bufferCount;
 		swapCreateInfo.imageFormat = m_SurfaceFormat.format;
 		swapCreateInfo.imageColorSpace = m_SurfaceFormat.colorSpace;
-		swapCreateInfo.imageExtent = {width, height};
+		swapCreateInfo.imageExtent = { width, height };
 		swapCreateInfo.imageArrayLayers = 1;
 		swapCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 		swapCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -95,11 +145,11 @@ namespace Engine
 		swapCreateInfo.compositeAlpha = VkCompositeAlphaFlagBitsKHR::VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		swapCreateInfo.presentMode = presentMode;
 		swapCreateInfo.clipped = VK_TRUE;
-		swapCreateInfo.oldSwapchain = m_SwapChain;
+		swapCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
 		VkResult result = vkCreateSwapchainKHR(api.GetDevice(), &swapCreateInfo, nullptr, &m_SwapChain);
 
-		CORE_ASSERT(result == VK_SUCCESS, 
+		CORE_ASSERT(result == VK_SUCCESS,
 			"Failed to create swap chain");
 
 		// get swap chain images
@@ -107,7 +157,7 @@ namespace Engine
 		vkGetSwapchainImagesKHR(api.GetDevice(), m_SwapChain, &imageCount, nullptr);
 		std::vector<VkImage> images{ imageCount };
 		vkGetSwapchainImagesKHR(api.GetDevice(), m_SwapChain, &imageCount, images.data());
-		
+
 		// create image views
 		std::vector<VkImageView> imageViews{ imageCount };
 		for (uint32 i = 0; i < imageCount; i++)
@@ -117,7 +167,7 @@ namespace Engine
 			imageViewCreateInfo.image = images[i];
 			imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 			imageViewCreateInfo.format = m_SurfaceFormat.format;
-			imageViewCreateInfo.components = {	VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, 
+			imageViewCreateInfo.components = { VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY,
 												VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY };
 			imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
@@ -137,10 +187,10 @@ namespace Engine
 			((VulkanTexture*)m_Images[i].get())->CreateImage(width, height, images[i], imageViews[i],
 				m_SurfaceFormat.format, VK_NULL_HANDLE, VK_IMAGE_LAYOUT_UNDEFINED, TextureFormat::Screen);
 		}
-		
+
 
 		m_DepthStencilImage = Texture::Create(width, height, TextureFormat::DepthStencil, nullptr);
-		
+
 		// create frame buffers
 		m_FrameBuffers.resize(imageCount);
 		for (uint32 i = 0; i < imageCount; i++)
@@ -157,54 +207,20 @@ namespace Engine
 
 		// get the first image
 		GetNextImage();
-
 	}
 
-	VulkanSwapChain::~VulkanSwapChain()
+	void VulkanSwapChain::DestroySwapChain()
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 		if (m_AquireFence != VK_NULL_HANDLE)
+		{
 			vkDestroyFence(api.GetDevice(), m_AquireFence, nullptr);
+			m_AquireFence = VK_NULL_HANDLE;
+		}
 
 		m_Images.clear();
 		vkDestroySwapchainKHR(api.GetDevice(), m_SwapChain, nullptr);
 		vkDestroySurfaceKHR(api.GetInstance(), m_WindowSurface, nullptr);
-	}
-
-	void VulkanSwapChain::Resize(uint32 width, uint32 height)
-	{
-
-	}
-
-	Ref<FrameBuffer> VulkanSwapChain::GetBackBuffer()
-	{
-		return m_FrameBuffers[m_FrontIndex];
-	}
-
-	void VulkanSwapChain::Swap()
-	{
-		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
-
-		// present the image
-		VkResult presentResult = VkResult::VK_RESULT_MAX_ENUM;
-		VkPresentInfoKHR presentInfo{};
-		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-		presentInfo.waitSemaphoreCount = 0;
-		presentInfo.pWaitSemaphores = nullptr;
-		presentInfo.swapchainCount = 1;
-		presentInfo.pSwapchains = &m_SwapChain;
-		presentInfo.pImageIndices = &m_FrontIndex;
-		presentInfo.pResults = &presentResult;
-		VkResult result = vkQueuePresentKHR(api.GetQueue(), &presentInfo);
-		CORE_ASSERT(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR,
-			"failed to present image");
-		if (result == VK_SUBOPTIMAL_KHR)
-			CORE_WARN("swapchain no longer matches window surface but can still be presented");
-		CORE_ASSERT(presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR, "failed to present image");
-
-		// get the next image
-		GetNextImage();
-		
 	}
 
 	void VulkanSwapChain::GetNextImage()

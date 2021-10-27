@@ -22,6 +22,10 @@ namespace Engine
 		virtual void Swap() override;
 
 	private:
+
+		void GenSwapChain(uint32 width, uint32 height);
+		void DestroySwapChain();
+
 		void GetNextImage();
 		
 	private:
@@ -36,6 +40,8 @@ namespace Engine
 
 		uint32 m_FrontIndex = 0;
 		VkFence m_AquireFence = VK_NULL_HANDLE;
+
+		void* m_Window;
 	};
 }
 

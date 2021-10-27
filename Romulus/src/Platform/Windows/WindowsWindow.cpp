@@ -56,7 +56,6 @@ namespace Engine
 			DispatchMessage(&msg);
 		}
 
-
 		// swap the frame buffers
 		m_SwapChain->Swap();
 	}
