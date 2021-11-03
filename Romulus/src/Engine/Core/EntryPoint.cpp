@@ -12,11 +12,13 @@ extern Engine::Application* Engine::CreateApplication();
 	
 int main(int argc, char** argv)
 {
+	// initialize the loging system
 	Engine::Log::Init();
 
+	// create an application
 	Engine::Application* app = Engine::CreateApplication();
 
-	app->Run();
+	app->Run(); // run the application
 
 	return EXIT_SUCCESS;
 }

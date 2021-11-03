@@ -4,10 +4,17 @@
 #include "Time.h"
 #include "Layer.h"
 
+Engine::Application* Engine::Application::s_Instance = nullptr;
+
 namespace Engine
 {
 	Application::Application(const std::string& title, uint32 width, uint32 height)
 	{
+		if (s_Instance != nullptr)
+			return;
+		s_Instance = this;
+
+		// create the main window
 		m_Window = Engine::Window::Create(width, height, title);
 	}
 
@@ -36,7 +43,7 @@ namespace Engine
 
 	void Application::Run()
 	{
-
+		// main game loop
 		while (!m_Window->IsWindowClosed())
 		{
 			m_Window->OnUpdate();
