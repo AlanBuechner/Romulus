@@ -12,6 +12,7 @@ namespace Engine
 		VulkanTexture(uint32 width, uint32 height, TextureFormat format, void* data);
 		~VulkanTexture();
 
+		inline VkImage GetVulkanImage() const { return m_ImageBuffer; }
 		inline VkFormat GetVulkanFormat() const { return m_ImageFormat; }
 		inline VkImageLayout GetVulkanLayout() const { return m_Layout; }
 		inline VkImageView GetView() const { return m_ImageView; }

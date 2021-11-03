@@ -7,6 +7,9 @@
 #include "VulkanSwapChain.h"
 #include "VulkanFrameBuffer.h"
 
+#include "Engine\Renderer\CommandBuffers.h"
+#include "VulkanCommands.h"
+
 
 namespace Engine
 {
@@ -14,10 +17,18 @@ namespace Engine
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 		vkDestroyRenderPass(api.GetDevice(), m_RenderPass, nullptr);
+		vkDestroyCommandPool(api.GetDevice(), m_Pool, nullptr);
 	}
 
 	void VulkanRenderPass::GenerateRenderPass()
 	{
+		BeginRenderPassCommand beginCommand;
+		beginCommand.color = m_ClearColor;
+		beginCommand.buffer = m_DestinationBuffer;
+		m_Commands.insert(m_Commands.begin(), CreateRef<BeginRenderPassCommand>(beginCommand));
+		m_Commands.push_back(CreateRef<EndRenderPassCommand>());
+
+
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 		
 		// get the destination frame buffer
@@ -25,7 +36,6 @@ namespace Engine
 		if (!destBuffer) // if not desitnation buffer is specified draw the the swap chins front buffer
 			destBuffer = Application::GetWindow()->GetSwapChain().GetBackBuffer();
 		
-
 		// get the attachments for the destination frame buffer
 		std::vector<FrameBufferAttachments>& frameAttachments = destBuffer->GetAttachments();
 
@@ -82,24 +92,20 @@ namespace Engine
 			image.SetVulkanLayout(finalLayout);
 		}
 
-		std::vector<VkSubpassDescription> subPasses;
-		
+		std::vector<VkSubpassDescription> subPasses{ 1 };
+
+		static std::vector<VkAttachmentReference> s_AttachmentRefrences;
+
 		// TODO : generate sub passes
-		std::array<VkAttachmentReference, 1> colorAttachments;
-		colorAttachments[0].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		colorAttachments[0].attachment = 0;
+		s_AttachmentRefrences.push_back({ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+		s_AttachmentRefrences.push_back({ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL });
 
-		VkAttachmentReference depthStencilAttachment;
-		depthStencilAttachment.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		depthStencilAttachment.attachment = 1;
-
-		subPasses.resize(1);
 		subPasses[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subPasses[0].inputAttachmentCount = 0;
 		subPasses[0].pInputAttachments = nullptr;
-		subPasses[0].colorAttachmentCount = (uint32)colorAttachments.size();
-		subPasses[0].pColorAttachments = colorAttachments.data();
-		subPasses[0].pDepthStencilAttachment = &depthStencilAttachment;
+		subPasses[0].colorAttachmentCount = 1;
+		subPasses[0].pColorAttachments = &s_AttachmentRefrences[0];
+		subPasses[0].pDepthStencilAttachment = &s_AttachmentRefrences[1];
 
 		// create the render pass
 		VkRenderPassCreateInfo rpCreateInfo{};
@@ -113,7 +119,6 @@ namespace Engine
 
 		CORE_ASSERT(vkCreateRenderPass(api.GetDevice(), &rpCreateInfo, nullptr, &m_RenderPass) == VK_SUCCESS,
 			"failed to create render pass");
-
 
 		// create command pool
 		VkCommandPoolCreateInfo poolCreateInfo{};
@@ -131,47 +136,25 @@ namespace Engine
 		allocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocateInfo.commandBufferCount = 1;
 
-		CORE_ASSERT(vkAllocateCommandBuffers(api.GetDevice(), &allocateInfo, &m_ClearBuffer) == VK_SUCCESS,
+		CORE_ASSERT(vkAllocateCommandBuffers(api.GetDevice(), &allocateInfo, &m_CommandBuffer) == VK_SUCCESS,
 			"failed to allocate memory for command buffers");
 
 	}
 
-	void VulkanRenderPass::Run()
+	void VulkanRenderPass::Execute()
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 
-		// bind the frame buffer to the render pass
-		Ref<FrameBuffer> destBuffer = m_DestinationBuffer;
-		if (!destBuffer) // if not desitnation buffer is specified draw the the swap chins front buffer
-			destBuffer = Application::GetWindow()->GetSwapChain().GetBackBuffer();
-		destBuffer->BindToRenderPass(*this);
-
+		// create command buffer
 		VkCommandBufferBeginInfo clearInfo{};
 		clearInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		clearInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-		CORE_ASSERT(vkBeginCommandBuffer(m_ClearBuffer, &clearInfo) == VK_SUCCESS,
+		CORE_ASSERT(vkBeginCommandBuffer(m_CommandBuffer, &clearInfo) == VK_SUCCESS,
 			"failed to begin command buffer");
 
-		std::array<VkClearValue, 2> clearColor{};
-		clearColor[0].color.float32[0] = m_ClearColor.r;
-		clearColor[0].color.float32[1] = m_ClearColor.g;
-		clearColor[0].color.float32[2] = m_ClearColor.b;
-		clearColor[0].color.float32[3] = m_ClearColor.a;
-		clearColor[1].depthStencil = { 0.0f , 0 };
+		for (uint32 i = 0; i < m_Commands.size(); i++)
+			CreateRenderCommand(*m_Commands[i], m_CommandBuffer, *this);
 
-		VkRenderPassBeginInfo beginRenderPassInfo{};
-		beginRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		beginRenderPassInfo.renderPass = m_RenderPass;
-		beginRenderPassInfo.framebuffer = (*(VulkanFrameBuffer*)destBuffer.get()).GetVulkanFrameBuffer();
-		beginRenderPassInfo.renderArea = { {0, 0}, {destBuffer->GetWidth(), destBuffer->GetHeight()} };
-		beginRenderPassInfo.clearValueCount = (uint32)clearColor.size();
-		beginRenderPassInfo.pClearValues = clearColor.data();
-
-		vkCmdBeginRenderPass(m_ClearBuffer, &beginRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		vkCmdEndRenderPass(m_ClearBuffer);
-
-		vkEndCommandBuffer(m_ClearBuffer);
+		vkEndCommandBuffer(m_CommandBuffer);
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -179,7 +162,7 @@ namespace Engine
 		submitInfo.pWaitSemaphores = nullptr;
 		submitInfo.pWaitDstStageMask = nullptr;
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &m_ClearBuffer;
+		submitInfo.pCommandBuffers = &m_CommandBuffer;
 		submitInfo.signalSemaphoreCount = 0;
 		submitInfo.pSignalSemaphores = nullptr;
 

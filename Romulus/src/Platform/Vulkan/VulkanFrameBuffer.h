@@ -13,7 +13,7 @@ namespace Engine
 		VulkanFrameBuffer(uint32 width, uint32 height, std::vector<FrameBufferAttachments> attachments);
 		~VulkanFrameBuffer();
 
-		virtual void BindToRenderPass(RenderPass& renderPass) override;
+		virtual void BindToRenderPass(const RenderPass& renderPass) override;
 
 		VkFramebuffer GetVulkanFrameBuffer() { return m_FrameBuffer; }
 

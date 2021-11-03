@@ -55,7 +55,8 @@ namespace Engine
 		// pull events
 		MSG msg;
 		BOOL gResult = PeekMessage(&msg, hWnd, 0, 0, PM_REMOVE);
-		if (gResult != 0) {
+		if (gResult != 0) 
+		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -160,7 +161,6 @@ namespace Engine
 
 	LRESULT WindowsWindow::HandleEvent(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-
 		switch (msg)
 		{
 			// keyboard events

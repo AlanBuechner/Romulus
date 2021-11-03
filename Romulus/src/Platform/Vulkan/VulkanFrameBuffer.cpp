@@ -29,7 +29,7 @@ namespace Engine
 	{
 	}
 
-	void VulkanFrameBuffer::BindToRenderPass(RenderPass& renderPass)
+	void VulkanFrameBuffer::BindToRenderPass(const RenderPass& renderPass)
 	{
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 

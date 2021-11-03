@@ -6,6 +6,7 @@
 
 namespace Engine
 {
+
 	Ref<RenderPass> Engine::RenderPass::Create()
 	{
 		switch (RendererCommand::GetApi())

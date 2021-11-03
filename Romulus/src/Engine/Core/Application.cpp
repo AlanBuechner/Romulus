@@ -37,7 +37,7 @@ namespace Engine
 		Ref<RenderPass> renderPass = RenderPass::Create();
 		renderPass->m_RenderPassType = RenderPass::RenderPassType::Forword;
 		renderPass->m_ClearType = RenderPass::ClearType::Color;
-		renderPass->m_ClearColor = {1.0f, 1.0f, 0.0f, 0.0f};
+		renderPass->m_ClearColor = {0.0f, 0.0f, 1.0f, 1.0f};
 		renderPass->GenerateRenderPass();
 
 		// main game loop
@@ -46,7 +46,7 @@ namespace Engine
 			Time::UpdateDeltaTime();
 			if (!m_Window->IsMinimized())
 			{
-				renderPass->Run();
+				renderPass->Execute();
 
 			}
 			m_Window->OnUpdate(); // update the window
