@@ -23,6 +23,8 @@ namespace Engine
 		void PushLayer(Layer* Layer);
 		void PushOverlay(Layer* Layer);
 
+		void OnEvent(Event& e);
+
 	private:
 		Ref<Window> m_Window;
 

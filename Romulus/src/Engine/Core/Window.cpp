@@ -11,6 +11,11 @@ namespace Engine
 		m_Width(width), m_Height(height), m_Title(title)
 	{ }
 
+	void Window::SetWindowEventCallback(const EventCallbackFn& callback)
+	{
+		m_EventCallback = callback;
+	}
+
 	Ref<Window> Window::Create(uint32 width, uint32 height, const std::string& title)
 	{
 #if defined(PLATFORM_WINDOWS)

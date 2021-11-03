@@ -11,6 +11,7 @@ namespace Engine
 		Window(uint32 width, uint32 height, const std::string& title);
 
 	public:
+		using EventCallbackFn = std::function<void(Event&)>;
 
 		virtual void OnUpdate() = 0; // updates the window
 
@@ -34,12 +35,12 @@ namespace Engine
 		virtual void ToggleMaximize() = 0;
 		virtual void ToggleFullScreen() = 0;
 
+		void SetWindowEventCallback(const EventCallbackFn& callback);
+
 		static Ref<Window> Create(uint32 width, uint32 height, const std::string& title);
 
 
-
 	protected:
-
 
 		uint32 m_Width;
 		uint32 m_Height; 
@@ -49,5 +50,7 @@ namespace Engine
 		bool m_FullScreen = false;
 
 		std::string m_Title;
+
+		EventCallbackFn m_EventCallback = nullptr;
 	};
 }

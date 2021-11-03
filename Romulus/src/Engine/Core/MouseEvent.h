@@ -64,6 +64,7 @@ namespace Engine
 
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
+	public:
 		MouseButtonPressedEvent(int button)
 			: MouseButtonEvent(button) {}
 

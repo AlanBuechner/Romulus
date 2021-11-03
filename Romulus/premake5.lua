@@ -53,7 +53,7 @@ project "Romulus"
 
 	filter "configurations:Debug"
 		defines "DEBUG"
-		buildoptions "/MDd"
+		buildoptions "/MTd"
 		runtime "Debug"
 		symbols "on"
 
@@ -64,7 +64,7 @@ project "Romulus"
 
 	filter "configurations:Release"
 		defines "RELEASE"
-		buildoptions "/MD"
+		buildoptions "/MT"
 		runtime "Release"
 		optimize "on"
 
@@ -75,7 +75,7 @@ project "Romulus"
 
 	filter "configurations:Dist"
 		defines "DIST"
-		buildoptions "/MD"
+		buildoptions "/MT"
 		runtime "Release"
 		optimize "on"
 

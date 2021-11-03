@@ -1,5 +1,9 @@
 #include "pch.h"
 #include "WindowsWindow.h"
+#include "Engine\Core\Event.h"
+#include "Engine\Core\ApplicationEvent.h"
+#include "Engine\Core\KeyEvent.h"
+#include "Engine\Core\MouseEvent.h"
 
 Engine::WindowsWindow::WindowClass Engine::WindowsWindow::WindowClass::wndClass;
 
@@ -164,30 +168,49 @@ namespace Engine
 			// keyboard events
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN: // key down
-			
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new KeyPressedEvent(static_cast<unsigned char>(wParam), 0));
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP: // key up
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new KeyReleasedEvent(static_cast<unsigned char>(wParam)));
 			break;
 		case WM_CHAR:
+			// TODO
 			break;
 
 			// mouse
 		case WM_MOUSEMOVE: // mouse move
+			if (m_EventCallback == nullptr) break;
+			POINTS pt = MAKEPOINTS(lParam);
+			m_EventCallback(*new MouseMovedEvent(pt.x, pt.y));
 			break;
 
 		case WM_LBUTTONDOWN: // left mouse down
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonPressedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONDOWN: // right mouse down
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonPressedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONDOWN: // middle mouse down
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonPressedEvent(VK_MBUTTON));
 			break;
 
 		case WM_LBUTTONUP: // left moues up
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonReleasedEvent(VK_LBUTTON));
 			break;
 		case WM_RBUTTONUP: // right mouse up
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonReleasedEvent(VK_RBUTTON));
 			break;
 		case WM_MBUTTONUP: // middle mouse up
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new MouseButtonReleasedEvent(VK_MBUTTON));
 			break;
 
 
@@ -217,11 +240,16 @@ namespace Engine
 			m_Width = LOWORD(lParam);
 			m_Height = HIWORD(lParam);
 			// resize swap chain
+
+			if (m_EventCallback == nullptr) break;
+			m_EventCallback(*new WindowResizeEvent(m_Width, m_Height));
 			break;
 		}
 		case WM_KILLFOCUS: // window remove focuse event
 			break;
 		case WM_CLOSE: // window close event
+			if (m_EventCallback != nullptr)
+				m_EventCallback(*new WindowCloseEvent());
 			Close();
 			break;
 		}
