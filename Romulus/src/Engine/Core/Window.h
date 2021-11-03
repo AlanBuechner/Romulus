@@ -1,6 +1,6 @@
 #pragma once
 #include "Core.h"
-
+#include "ApplicationEvent.h"
 #include <string>
 
 namespace Engine
@@ -36,10 +36,13 @@ namespace Engine
 
 		static Ref<Window> Create(uint32 width, uint32 height, const std::string& title);
 
+
+
 	protected:
 
+
 		uint32 m_Width;
-		uint32 m_Height;
+		uint32 m_Height; 
 
 		bool m_Minimized = false;
 		bool m_Maximized = false;
