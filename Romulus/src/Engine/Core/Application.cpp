@@ -2,8 +2,8 @@
 #include "Application.h"
 #include "Time.h"
 #include "Layer.h"
-
 #include "KeyEvent.h"
+#include "Engine/Util/Performance.h"
 
 Engine::Application* Engine::Application::s_Instance = nullptr;
 
@@ -16,8 +16,13 @@ namespace Engine
 		s_Instance = this;
 
 		// create the main window
+		CREATE_PROFILE_FUNCTIONI();
+		auto timer = CREATE_PROFILEI();
+		timer.Start("Create Window");
 		m_Window = Engine::Window::Create(width, height, title);
 		m_Window->SetWindowEventCallback(BIND_EVENT_FN(&Application::OnEvent));
+		timer.End();
+
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -53,17 +58,15 @@ namespace Engine
 	void Application::Run()
 	{
 		// main game loop
+		
 		while (!m_Window->IsWindowClosed())
 		{
+			CREATE_PROFILE_SCOPEI("Frame");
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
 			m_Window->OnUpdate();
 		}
-		
-		for (Layer* layer : m_LayerStack)
-			layer->OnUpdate();
-	
-	
 	}
-
 
 
 }

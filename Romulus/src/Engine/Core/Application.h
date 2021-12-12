@@ -12,6 +12,7 @@ namespace Engine
 		static Application* s_Instance;
 
 	public:
+		
 		Application(const std::string& title, uint32 width, uint32 height);
 
 		static Application* Get() { return s_Instance; }

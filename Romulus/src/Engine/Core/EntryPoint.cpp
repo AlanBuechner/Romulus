@@ -5,6 +5,7 @@
 #include "Cursor.h"
 #include "Log.h"
 #include "Application.h"
+#include <Engine/Util/Performance.h>
 
 #ifdef PLATFORM_WINDOWS
 
@@ -15,10 +16,15 @@ int main(int argc, char** argv)
 	// initialize the loging system
 	Engine::Log::Init();
 
-	// create an application
-	Engine::Application* app = Engine::CreateApplication();
 
-	app->Run(); // run the application
+	// create an application
+	Engine::Instrumentor::Get().BeginSession("Startup", "startup.json");
+	Engine::Application* app = Engine::CreateApplication();
+	Engine::Instrumentor::Get().EndSession();
+
+	Engine::Instrumentor::Get().BeginSession("Runtime", "runtime.json");
+	app->Run();
+	Engine::Instrumentor::Get().EndSession();
 
 	return EXIT_SUCCESS;
 }
