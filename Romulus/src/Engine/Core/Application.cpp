@@ -5,6 +5,7 @@
 #include "Engine\Renderer\RenderPass.h"
 #include "Engine\Renderer\RendererCommand.h"
 #include "Platform\Vulkan\VulkanRendererAPI.h"
+#include "Engine\Renderer\Shader.h"
 
 #include <vulkan\vulkan.h>
 
@@ -39,6 +40,8 @@ namespace Engine
 		renderPass->m_ClearType = RenderPass::ClearType::Color;
 		renderPass->m_ClearColor = {0.0f, 0.0f, 1.0f, 1.0f};
 		renderPass->GenerateRenderPass();
+
+		Ref<Shader> shader = Shader::Create("Resorces/Shaders/TestShader.glsl");
 
 		// main game loop
 		while (!m_Window->WantToClose())

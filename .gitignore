@@ -36,3 +36,7 @@ bin/
 bin-int/
 
 *.vcxproj*
+
+# shader bins
+*.glsl.vert
+*.glsl.frag

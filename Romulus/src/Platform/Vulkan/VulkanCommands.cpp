@@ -33,7 +33,7 @@ namespace Engine
 
 		vkCmdBeginRenderPass(buffer, &beginRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		VkViewport viewport{0,0, destBuffer->GetWidth(), destBuffer->GetHeight(), 0, 1};
+		VkViewport viewport{0,0, (float)destBuffer->GetWidth(), (float)destBuffer->GetHeight(), 0, 1};
 		vkCmdSetViewport(buffer, 0, 1, &viewport);
 
 		vkCmdSetScissor(buffer, 0, 1, &beginRenderPassInfo.renderArea);
