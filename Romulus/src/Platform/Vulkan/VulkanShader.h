@@ -20,5 +20,6 @@ namespace Engine
 		VkShaderModule CreateShaderModual(std::vector<uint32> data);
 
 		Ref<ShaderSorce> m_ShaderPaths;
+		std::unordered_map<ShaderType, VkShaderModule> m_ShaderModuals;
 	};
 }

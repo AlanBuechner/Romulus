@@ -22,6 +22,9 @@ namespace Engine
 			default:
 				break;
 			}
+
+			CORE_ASSERT(false, "no valid rendering api");
+			return "";
 		}
 
 		static shaderc_shader_kind GetShadercKind(Shader::ShaderType type)
@@ -34,6 +37,9 @@ namespace Engine
 			default:
 				break;
 			}
+			
+			CORE_ASSERT(false, "not valid shader type");
+			return (shaderc_shader_kind)0;
 		}
 
 		std::string GetCashedShaderExtention(Shader::ShaderType type)
@@ -46,6 +52,9 @@ namespace Engine
 			default:
 				break;
 			}
+
+			CORE_ASSERT(false, "not valid shader type");
+			return "";
 		}
 
 	}
@@ -57,20 +66,26 @@ namespace Engine
 		std::filesystem::path casheDirectory = Utils::GetShaderCasheDirectory();
 		if (!std::filesystem::exists(casheDirectory))
 			std::filesystem::create_directories(casheDirectory);
-		
-		std::unordered_map<ShaderType, VkShaderModule> shaderModuals;
 
 		if(!src->vertexPath.empty())
-			shaderModuals[ShaderType::Vertex] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Vertex));
+			m_ShaderModuals[ShaderType::Vertex] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Vertex));
 		if (!src->pixlePath.empty())
-			shaderModuals[ShaderType::Pixle] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Pixle));
+			m_ShaderModuals[ShaderType::Pixle] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Pixle));
 		if (!src->geometryPath.empty())
-			shaderModuals[ShaderType::Geometry] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Geometry));
+			m_ShaderModuals[ShaderType::Geometry] = CreateShaderModual(CompileShaderToSpirv(ShaderType::Geometry));
 
 	}
 
 	VulkanShader::~VulkanShader()
 	{
+		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
+
+		if(!m_ShaderPaths->vertexPath.empty())
+			vkDestroyShaderModule(api.GetDevice(), m_ShaderModuals[ShaderType::Vertex], nullptr);
+		if(!m_ShaderPaths->pixlePath.empty())
+			vkDestroyShaderModule(api.GetDevice(), m_ShaderModuals[ShaderType::Pixle], nullptr);
+		if(!m_ShaderPaths->geometryPath.empty())
+			vkDestroyShaderModule(api.GetDevice(), m_ShaderModuals[ShaderType::Geometry], nullptr);
 	}
 
 	void VulkanShader::Bind() const
