@@ -15,6 +15,8 @@ namespace Engine
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
+		inline std::unordered_map<ShaderType, VkShaderModule> GetShaderModules() { return m_ShaderModuals; }
+
 	private:
 		std::vector<uint32> CompileShaderToSpirv(ShaderType type);
 		VkShaderModule CreateShaderModual(std::vector<uint32> data);

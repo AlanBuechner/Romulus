@@ -6,6 +6,7 @@
 #include "Engine\Renderer\RendererCommand.h"
 #include "Platform\Vulkan\VulkanRendererAPI.h"
 #include "Engine\Renderer\Shader.h"
+#include "Engine\Renderer\RenderPipeline.h"
 
 #include <vulkan\vulkan.h>
 
@@ -42,6 +43,7 @@ namespace Engine
 		renderPass->GenerateRenderPass();
 
 		Ref<Shader> shader = Shader::Create("Resorces/Shaders/TestShader.glsl");
+		Ref<RenderPipeline> pipeline = RenderPipeline::Create(shader, renderPass, RenderPipeline::Topology::Triangles, false);
 
 		// main game loop
 		while (!m_Window->WantToClose())

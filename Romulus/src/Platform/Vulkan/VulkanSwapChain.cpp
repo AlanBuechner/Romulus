@@ -66,6 +66,9 @@ namespace Engine
 
 	void VulkanSwapChain::GenSwapChain(uint32 width, uint32 height)
 	{
+		m_Width = width;
+		m_Height = height;
+
 		VulkanRendererAPI& api = *(VulkanRendererAPI*)RendererCommand::GetApiInstance();
 
 		// create the window surface
